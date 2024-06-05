@@ -45,7 +45,7 @@ public final class ModrinthRemoteModRepository implements RemoteModRepository {
     public static final ModrinthRemoteModRepository MODPACKS = new ModrinthRemoteModRepository("modpack");
     public static final ModrinthRemoteModRepository RESOURCE_PACKS = new ModrinthRemoteModRepository("resourcepack");
 
-    private static final String PREFIX = "https://api.modrinth.com";
+    private static final String PREFIX = "https://mcim.z0z0r4.top/v1/modrinth";
 
     private final String projectType;
 
@@ -92,7 +92,7 @@ public final class ModrinthRemoteModRepository implements RemoteModRepository {
                 pair("limit", Integer.toString(pageSize)),
                 pair("index", convertSortType(sort))
         );
-        Response<ProjectSearchResult> response = HttpRequest.GET(NetworkUtils.withQuery(PREFIX + "/v2/search", query))
+        Response<ProjectSearchResult> response = HttpRequest.GET(NetworkUtils.withQuery(PREFIX + "/search", query))
                 .getJson(new TypeToken<Response<ProjectSearchResult>>() {
                 }.getType());
         return new SearchResult(response.getHits().stream().map(ProjectSearchResult::toMod), (int)Math.ceil((double)response.totalHits / pageSize));
@@ -103,7 +103,7 @@ public final class ModrinthRemoteModRepository implements RemoteModRepository {
         String sha1 = DigestUtils.digestToString("SHA-1", file);
 
         try {
-            ProjectVersion mod = HttpRequest.GET(PREFIX + "/v2/version_file/" + sha1,
+            ProjectVersion mod = HttpRequest.GET(PREFIX + "/version_file/" + sha1,
                             pair("algorithm", "sha1"))
                     .getJson(ProjectVersion.class);
             return mod.toVersion();
@@ -119,7 +119,7 @@ public final class ModrinthRemoteModRepository implements RemoteModRepository {
     @Override
     public RemoteMod getModById(String id) throws IOException {
         id = StringUtils.removePrefix(id, "local-");
-        Project project = HttpRequest.GET(PREFIX + "/v2/project/" + id).getJson(Project.class);
+        Project project = HttpRequest.GET(PREFIX + "/project/" + id).getJson(Project.class);
         return project.toMod();
     }
 
@@ -131,14 +131,14 @@ public final class ModrinthRemoteModRepository implements RemoteModRepository {
     @Override
     public Stream<RemoteMod.Version> getRemoteVersionsById(String id) throws IOException {
         id = StringUtils.removePrefix(id, "local-");
-        List<ProjectVersion> versions = HttpRequest.GET(PREFIX + "/v2/project/" + id + "/version")
+        List<ProjectVersion> versions = HttpRequest.GET(PREFIX + "/project/" + id + "/version")
                 .getJson(new TypeToken<List<ProjectVersion>>() {
                 }.getType());
         return versions.stream().map(ProjectVersion::toVersion).flatMap(Lang::toStream);
     }
 
     public List<Category> getCategoriesImpl() throws IOException {
-        List<Category> categories = HttpRequest.GET(PREFIX + "/v2/tag/category").getJson(new TypeToken<List<Category>>() {}.getType());
+        List<Category> categories = HttpRequest.GET(PREFIX + "/tag/category").getJson(new TypeToken<List<Category>>() {}.getType());
         return categories.stream().filter(category -> category.getProjectType().equals(projectType)).collect(Collectors.toList());
     }
 
