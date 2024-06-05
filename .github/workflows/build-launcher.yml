@@ -10,6 +10,8 @@ on:
       - 'HMCLauncher/**'
       - '.github/workflows/build-launcher.yml'
 
+  workflow_dispatch:
+
 jobs:
   build:
     runs-on: windows-latest
