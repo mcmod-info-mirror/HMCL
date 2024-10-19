@@ -180,7 +180,7 @@ public final class CurseForgeRemoteModRepository implements RemoteModRepository 
 
     @Override
     public RemoteMod.File getModFile(String modId, String fileId) throws IOException {
-        Response<CurseAddon.LatestFile> response = HttpRequest.GET(String.format("%s/mods/%s/files/%s", PREFIX, modId, fileId))
+        Response<CurseAddon.LatestFile> response = HttpRequest.GET(String.format("%s/v1/mods/%s/files/%s", PREFIX, modId, fileId))
                 .header("X-API-KEY", apiKey)
                 .getJson(new TypeToken<Response<CurseAddon.LatestFile>>() {
                 }.getType());
